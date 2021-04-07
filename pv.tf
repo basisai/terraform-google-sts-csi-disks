@@ -1,4 +1,3 @@
-
 resource "kubernetes_persistent_volume" "disk" {
   count = var.replicas
 
