@@ -74,7 +74,7 @@ variable "disk_source_image" {
 }
 
 variable "disk_source_snapshot" {
-  description = "Source image for disk. `element` will be used to index the list"
+  description = "Source snapshot for disk. `element` will be used to index the list"
   type = list(object({
     snapshot = string, # source snapshot
 

@@ -17,7 +17,7 @@ resource "google_compute_disk" "disk" {
   image = length(var.disk_source_image) > 0 ? element(var.disk_source_image, count.index).image : null
   dynamic "source_image_encryption_key" {
     for_each = length(var.disk_source_image) > 0 ? (
-      alltrue([for v in values(element(var.disk_source_image, count.index)) : v != null]) ? [element(var.disk_source_image, count.index)] : []
+      anytrue([for k, v in element(var.disk_source_image, count.index) : k != "image" && v != null]) ? [element(var.disk_source_image, count.index)] : []
     ) : []
 
     content {
@@ -28,10 +28,10 @@ resource "google_compute_disk" "disk" {
     }
   }
 
-  snapshot = length(var.disk_source_snapshot) > 0 ? element(var.disk_source_snapshot, count.index).image : null
+  snapshot = length(var.disk_source_snapshot) > 0 ? element(var.disk_source_snapshot, count.index).snapshot : null
   dynamic "source_snapshot_encryption_key" {
     for_each = length(var.disk_source_snapshot) > 0 ? (
-      alltrue([for v in values(element(var.disk_source_snapshot, count.index)) : v != null]) ? [element(var.disk_source_snapshot, count.index)] : []
+      anytrue([for k, v in element(var.disk_source_snapshot, count.index) : k != "snapshot" && v != null]) ? [element(var.disk_source_snapshot, count.index)] : []
     ) : []
 
     content {
@@ -44,7 +44,7 @@ resource "google_compute_disk" "disk" {
 
   dynamic "disk_encryption_key" {
     for_each = length(var.disk_encryption_key) > 0 ? (
-      alltrue([for v in values(element(var.disk_encryption_key, count.index)) : v != null]) ? [element(var.disk_encryption_key, count.index)] : []
+      anytrue([for v in values(element(var.disk_encryption_key, count.index)) : v != null]) ? [element(var.disk_encryption_key, count.index)] : []
     ) : []
 
     content {
@@ -70,14 +70,14 @@ resource "google_compute_region_disk" "disk" {
   project = var.project_id
 
   replica_zones = coalescelist(
-    element(var.regional_disk_zones, count.index),
+    try(element(var.regional_disk_zones, count.index), []),
     [element(data.google_compute_zones.available.names, count.index), element(data.google_compute_zones.available.names, count.index + 1)]
   )
 
-  snapshot = length(var.disk_source_snapshot) > 0 ? element(var.disk_source_snapshot, count.index).image : null
+  snapshot = length(var.disk_source_snapshot) > 0 ? element(var.disk_source_snapshot, count.index).snapshot : null
   dynamic "source_snapshot_encryption_key" {
     for_each = length(var.disk_source_snapshot) > 0 ? (
-      alltrue([for v in values(element(var.disk_source_snapshot, count.index)) : v != null]) ? [element(var.disk_source_snapshot, count.index)] : []
+      anytrue([for k, v in element(var.disk_source_snapshot, count.index) : k != "snapshot" && v != null]) ? [element(var.disk_source_snapshot, count.index)] : []
     ) : []
 
     content {
@@ -89,7 +89,7 @@ resource "google_compute_region_disk" "disk" {
 
   dynamic "disk_encryption_key" {
     for_each = length(var.disk_encryption_key) > 0 ? (
-      alltrue([for v in values(element(var.disk_encryption_key, count.index)) : v != null]) ? [element(var.disk_encryption_key, count.index)] : []
+      anytrue([for v in values(element(var.disk_encryption_key, count.index)) : v != null]) ? [element(var.disk_encryption_key, count.index)] : []
     ) : []
 
     content {

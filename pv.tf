@@ -22,11 +22,13 @@ resource "kubernetes_persistent_volume" "disk" {
           match_expressions {
             key      = "topology.gke.io/zone"
             operator = "In"
-            values = var.regional_disks ? (
-              google_compute_region_disk.disk[count.index].replica_zones
-              ) : (
-              [google_compute_disk.disk[count.index].zone]
-            )
+            values = [for zone in(
+              var.regional_disks ? (
+                google_compute_region_disk.disk[count.index].replica_zones
+                ) : (
+                [google_compute_disk.disk[count.index].zone]
+              )
+            ) : reverse(split("/", zone))[0]]
           }
         }
       }
