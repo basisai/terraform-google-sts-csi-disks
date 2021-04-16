@@ -9,7 +9,8 @@ resource "google_compute_disk" "disk" {
   size      = var.disk_size
   interface = var.disk_interface
 
-  labels  = var.labels
+  # Automatically applied GKE labels: https://cloud.google.com/kubernetes-engine/docs/how-to/creating-managing-labels
+  labels  = merge(var.labels, { goog-gke-volume = "" })
   project = var.project_id
 
   zone = element(coalescelist(var.zonal_disk_zones, data.google_compute_zones.available.names), count.index)
@@ -66,7 +67,8 @@ resource "google_compute_region_disk" "disk" {
   type = var.disk_type
   size = var.disk_size
 
-  labels  = var.labels
+  # Automatically applied GKE labels: https://cloud.google.com/kubernetes-engine/docs/how-to/creating-managing-labels
+  labels  = merge(var.labels, { goog-gke-volume = "" })
   project = var.project_id
 
   replica_zones = coalescelist(
